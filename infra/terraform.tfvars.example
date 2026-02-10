@@ -1,0 +1,11 @@
+# Terraform variables for SalesPOC.AI infrastructure
+# Copy this to terraform.tfvars and update the values.
+
+resource_group_name   = "ai-myaacoub"
+location              = "East US"
+ai_account_name       = "001-ai-poc"
+ai_project_name       = "001-ai-proj"
+model_deployment_name = "gpt-4o"
+model_name            = "gpt-4o"
+model_version         = "2024-11-20"
+agent_name            = "arrow-sales-agent"
