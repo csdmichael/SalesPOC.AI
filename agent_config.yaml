@@ -1,4 +1,4 @@
-# Agent configuration for the Arrow Sales Agent
+# Agent configuration for the Sales Agent
 # This file defines the Azure AI Foundry agent used by the SalesPOC.API chat component.
 
 agent:
