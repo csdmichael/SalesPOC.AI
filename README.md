@@ -30,7 +30,7 @@ This repository manages the lifecycle of the Azure AI Foundry agent that answers
 │  └──────────────┘  └───────────────┘  └──────┬───────────┘  │
 │                                              │               │
 │                                    ┌─────────▼─────────┐    │
-│                                    │ arrow-sales-agent  │    │
+│                                    │ sales-agent       │    │
 │                                    └─────────┬─────────┘    │
 └──────────────────────────────────────────────┼───────────────┘
                                                │
