@@ -1,5 +1,9 @@
 # SalesPOC.AI
 
+## Main project
+
+- SalesPOC UI: https://github.com/csdmichael/SalesPOC.UI
+
 Azure AI Foundry agent source code and deployment pipeline for the **Arrow Sales Agent** — the AI-powered chat component consumed by [SalesPOC.API](../SalesPOC.API).
 
 ## Overview
