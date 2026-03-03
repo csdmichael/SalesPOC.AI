@@ -4,16 +4,18 @@
 
 - SalesPOC UI: https://github.com/csdmichael/SalesPOC.UI
 
-Azure AI Foundry agent source code and deployment pipeline for the **Arrow Sales Agent** — the AI-powered chat component consumed by [SalesPOC.API](../SalesPOC.API).
+Azure AI Foundry agent source code and deployment pipeline for the **Arrow Sales Agent** and the **Deal-Strategy Agent** — the AI-powered chat components consumed by [SalesPOC.API](../SalesPOC.API).
 
 ## Overview
 
-This repository manages the lifecycle of the Azure AI Foundry agent that answers natural language questions about sales data. It includes:
+This repository manages the lifecycle of AI Foundry agents for the Sales POC. It includes:
 
-- **Agent definition** (`agent_config.yaml`) — model, system prompt, tools, and parameters
-- **Deployment scripts** (`src/`) — Python scripts to create/update/delete the agent
+- **Agent definitions** — YAML configs for each agent (model, system prompt, tools, parameters)
+  - `agent_config.yaml` — Arrow Sales Agent (sales data Q&A)
+  - `deal_strategy_config.yaml` — Deal-Strategy Agent (deal analysis & recommendations)
+- **Deployment scripts** (`src/`) — Python scripts to create/update/delete/chat with agents
 - **Infrastructure** (`infra/`) — Terraform to provision Azure AI Services, Hub, and Project
-- **CI/CD** (`.github/workflows/`) — GitHub Actions workflow to deploy the agent automatically
+- **CI/CD** (`.github/workflows/`) — GitHub Actions workflow to deploy agents automatically
 
 ## Architecture
 
@@ -35,6 +37,7 @@ This repository manages the lifecycle of the Azure AI Foundry agent that answers
 │                                              │               │
 │                                    ┌─────────▼─────────┐    │
 │                                    │ sales-agent       │    │
+│                                    │ Deal-Strategy     │    │
 │                                    └─────────┬─────────┘    │
 └──────────────────────────────────────────────┼───────────────┘
                                                │
@@ -56,12 +59,14 @@ SalesPOC.AI/
 │   ├── main.tf                   # Terraform: AI Services, Hub, Project
 │   └── terraform.tfvars.example  # Terraform variables template
 ├── src/
-│   ├── agent.py                  # Agent deploy/update/delete CLI
+│   ├── agent.py                  # Arrow Sales Agent deploy/update/delete CLI
+│   ├── deal_strategy_agent.py    # Deal-Strategy Agent deploy/chat/ask CLI
 │   ├── config.py                 # Configuration loader (env + YAML)
 │   └── validate.py               # Post-deployment validation
 ├── .env.example                  # Environment variables template
 ├── .gitignore
-├── agent_config.yaml             # Agent definition (instructions, model, tools)
+├── agent_config.yaml             # Arrow Sales Agent definition
+├── deal_strategy_config.yaml     # Deal-Strategy Agent definition
 ├── requirements.txt              # Python dependencies
 └── README.md                     # This file
 ```
@@ -128,15 +133,54 @@ python agent.py deploy --force-recreate
 python agent.py deploy --config /path/to/custom_agent_config.yaml
 ```
 
+### Deal-Strategy Agent
+
+```bash
+cd src
+
+# Deploy the Deal-Strategy agent
+python deal_strategy_agent.py deploy
+
+# Interactive chat session
+python deal_strategy_agent.py chat
+
+# Ask a single question
+python deal_strategy_agent.py ask "What's the best strategy to close the Contoso deal?"
+
+# Get agent info
+python deal_strategy_agent.py info
+
+# Delete the agent
+python deal_strategy_agent.py delete
+
+# Force recreate
+python deal_strategy_agent.py deploy --force-recreate
+```
+
 ## Agent Configuration
 
-The agent is defined in [`agent_config.yaml`](agent_config.yaml):
+### Arrow Sales Agent
+
+Defined in [`agent_config.yaml`](agent_config.yaml) — answers natural language questions about sales data.
+
+### Deal-Strategy Agent
+
+Defined in [`deal_strategy_config.yaml`](deal_strategy_config.yaml) — provides strategic deal recommendations including:
+- Deal assessment & health scoring
+- Win/loss pattern analysis
+- Competitive positioning tactics
+- Stakeholder mapping & engagement strategies
+- Pricing & negotiation guidance
+- Risk identification & mitigation
+- Next-best-action recommendations
+
+### Configuration Fields
 
 | Field          | Description                                    |
 |----------------|------------------------------------------------|
 | `name`         | Agent name (must match `AzureAgent:AgentName` in SalesPOC.API) |
 | `model`        | OpenAI model deployment name                   |
-| `instructions` | System prompt with sales domain context         |
+| `instructions` | System prompt with domain context               |
 | `temperature`  | Response randomness (0.0 – 1.0)                |
 | `top_p`        | Nucleus sampling threshold                      |
 | `tools`        | Optional tools (Bing grounding, AI Search, etc.)|
@@ -224,15 +268,16 @@ terraform apply
 
 ## Relationship to SalesPOC.API
 
-The API's `ChatController` connects to this agent via the Azure AI Projects SDK:
+The API's `ChatController` connects to agents via the Azure AI Projects SDK:
 
 ```
 SalesPOC.API (appsettings.json)
-  └── AzureAgent:Endpoint  → AI Foundry project endpoint
-  └── AzureAgent:AgentName → "arrow-sales-agent" (must match agent_config.yaml)
+  └── AzureAgent:Endpoint       → AI Foundry project endpoint
+  └── AzureAgent:AgentName      → "arrow-sales-agent"  (agent_config.yaml)
+  └── AzureAgent:DealStrategy   → "Deal-Strategy"      (deal_strategy_config.yaml)
 ```
 
-Any changes to the agent's instructions or model in this repo are automatically deployed and immediately available to the API.
+Any changes to agent instructions or models in this repo are automatically deployed and immediately available to the API.
 
 ## License
 
