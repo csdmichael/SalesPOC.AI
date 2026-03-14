@@ -281,4 +281,4 @@ Any changes to agent instructions or models in this repo are automatically deplo
 
 ## License
 
-[Specify your license here]
+This project is licensed under the [MIT License](LICENSE).
